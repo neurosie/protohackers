@@ -1,5 +1,5 @@
 mod p00_smoke_test;
-extern crate tokio;
+mod p01_prime_time;
 
 use tokio::net::TcpListener;
 
@@ -14,10 +14,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Listening on port 7878");
 
     match problem {
-        0 => p00_smoke_test::run(listener),
+        0 => p00_smoke_test::run(listener).await,
+        1 => p01_prime_time::run(listener).await,
         _ => todo!(),
-    }
-    .await?;
+    }?;
 
     Ok(())
 }
