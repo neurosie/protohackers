@@ -1,27 +1,26 @@
-use std::{
-    io::{BufRead, BufReader, Read, Write},
-    net::{TcpListener, TcpStream},
-    thread,
-};
+extern crate tokio;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::net::{TcpListener, TcpStream};
 
-fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("0.0.0.0:7878").unwrap();
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let listener = TcpListener::bind("0.0.0.0:7878").await?;
 
-    for stream in listener.incoming() {
-        thread::spawn(|| -> std::io::Result<()> {
-            handle_connection(stream?)?;
-            Ok(())
+    loop {
+        let (stream, _) = listener.accept().await?;
+
+        tokio::spawn(async move {
+            if let Err(e) = handle_connection(stream).await {
+                eprintln!("error echoing to socket: {:?}", e);
+            };
         });
     }
-
-    Ok(())
 }
 
-fn handle_connection(mut stream: TcpStream) -> std::io::Result<()> {
-    // let stream = BufReader::new(stream);
+async fn handle_connection(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
     let mut buf = vec![];
-    stream.read_to_end(&mut buf)?;
-    stream.write_all(&buf)?;
+    stream.read_to_end(&mut buf).await?;
+    stream.write_all(&buf).await?;
 
     Ok(())
 }
