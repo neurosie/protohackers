@@ -1,5 +1,6 @@
 mod p00_smoke_test;
 mod p01_prime_time;
+mod p02_means_to_an_end;
 
 use tokio::net::TcpListener;
 
@@ -16,6 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match problem {
         0 => p00_smoke_test::run(listener).await,
         1 => p01_prime_time::run(listener).await,
+        2 => p02_means_to_an_end::run(listener).await,
         _ => todo!(),
     }?;
 
