@@ -2,8 +2,7 @@ mod p00_smoke_test;
 mod p01_prime_time;
 mod p02_means_to_an_end;
 mod p03_budget_chat;
-
-use tokio::net::TcpListener;
+mod p04_unusual_database_program;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,6 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         1 => p01_prime_time::run().await,
         2 => p02_means_to_an_end::run().await,
         3 => p03_budget_chat::run().await,
+        4 => p04_unusual_database_program::run().await,
         _ => todo!(),
     }?;
 

@@ -5,7 +5,7 @@
 // realized the problem: fly.io was spawning two instances of the app, and connections were split between them.
 // A desirable behavior usually I'm sure, but not with an in-memory chat room. `flyctl scale count 1` fixed it.
 
-use std::{collections::HashSet, net::SocketAddr, sync::Arc};
+use std::{collections::HashSet, sync::Arc};
 
 use lazy_regex::regex_is_match;
 use parking_lot::Mutex;

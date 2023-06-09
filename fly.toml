@@ -12,3 +12,13 @@ protocol = "tcp"
 
 [[services.ports]]
 port = 7878
+
+[[services]]
+internal_port = 7878
+protocol = "udp"
+
+[[services.ports]]
+port = 7878
+
+[env]
+UDP_ADDRESS = "fly-global-services"
