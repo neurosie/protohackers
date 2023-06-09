@@ -5,8 +5,12 @@ use tokio::{
     net::{TcpListener, TcpStream},
 };
 
-pub async fn run(listener: TcpListener) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!("Problem 0 - Smoke Test");
+
+    let listener = TcpListener::bind("0.0.0.0:7878").await?;
+    println!("Listening on port 7878");
+
     loop {
         let (stream, _) = listener.accept().await?;
 

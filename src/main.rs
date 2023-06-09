@@ -12,14 +12,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok_or("Requires one argument - the problem number.")?;
     let problem: u32 = arg.parse()?;
 
-    let listener = TcpListener::bind("0.0.0.0:7878").await?;
-    println!("Listening on port 7878");
-
     match problem {
-        0 => p00_smoke_test::run(listener).await,
-        1 => p01_prime_time::run(listener).await,
-        2 => p02_means_to_an_end::run(listener).await,
-        3 => p03_budget_chat::run(listener).await,
+        0 => p00_smoke_test::run().await,
+        1 => p01_prime_time::run().await,
+        2 => p02_means_to_an_end::run().await,
+        3 => p03_budget_chat::run().await,
         _ => todo!(),
     }?;
 

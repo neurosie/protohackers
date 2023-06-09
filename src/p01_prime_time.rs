@@ -13,8 +13,12 @@ struct Request {
     number: Number,
 }
 
-pub async fn run(listener: TcpListener) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!("Problem 1 - Prime Time");
+
+    let listener = TcpListener::bind("0.0.0.0:7878").await?;
+    println!("Listening on port 7878");
+
     loop {
         let (stream, addr) = listener.accept().await?;
 

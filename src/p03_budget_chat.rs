@@ -22,8 +22,11 @@ enum Message {
     Message { name: String, text: String },
 }
 
-pub async fn run(listener: TcpListener) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!("Problem 3 - Budget Chat");
+
+    let listener = TcpListener::bind("0.0.0.0:7878").await?;
+    println!("Listening on port 7878");
 
     let names = Arc::new(Mutex::new(HashSet::<String>::new()));
     let (tx, _) = broadcast::channel::<Message>(16);
@@ -33,7 +36,7 @@ pub async fn run(listener: TcpListener) -> Result<(), Box<dyn std::error::Error>
 
         let (names, tx) = (Arc::clone(&names), tx.clone());
         tokio::spawn(async move {
-            if let Err(e) = handle_connection(stream, addr, names, tx).await {
+            if let Err(e) = handle_connection(stream, names, tx).await {
                 eprintln!("error handling connection {}: {:?}", addr, e);
             };
         });
@@ -42,7 +45,6 @@ pub async fn run(listener: TcpListener) -> Result<(), Box<dyn std::error::Error>
 
 async fn handle_connection(
     mut stream: TcpStream,
-    addr: SocketAddr,
     names: Arc<Mutex<HashSet<String>>>,
     tx: Sender<Message>,
 ) -> Result<(), Box<dyn std::error::Error>> {
