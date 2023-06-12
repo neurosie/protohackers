@@ -3,6 +3,7 @@ mod p01_prime_time;
 mod p02_means_to_an_end;
 mod p03_budget_chat;
 mod p04_unusual_database_program;
+mod p05_mob_in_the_middle;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,6 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         2 => p02_means_to_an_end::run().await,
         3 => p03_budget_chat::run().await,
         4 => p04_unusual_database_program::run().await,
+        5 => p05_mob_in_the_middle::run().await,
         _ => todo!(),
     }?;
 

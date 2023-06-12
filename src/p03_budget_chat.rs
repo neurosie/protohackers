@@ -25,7 +25,7 @@ enum Message {
 pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!("Problem 3 - Budget Chat");
 
-    let listener = TcpListener::bind("0.0.0.0:7878").await?;
+    let listener = TcpListener::bind("0.0.0.0:9999").await?;
     println!("Listening on port 7878");
 
     let names = Arc::new(Mutex::new(HashSet::<String>::new()));
