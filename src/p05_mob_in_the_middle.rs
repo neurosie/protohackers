@@ -4,26 +4,31 @@ use lazy_regex::regex_replace;
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
     net::{TcpListener, TcpStream},
+    task::JoinHandle,
 };
 
-pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+use crate::BoxedErr;
+
+pub async fn run() -> JoinHandle<Result<(), BoxedErr>> {
     println!("Problem 5 - Mob in the Middle");
 
-    let listener = TcpListener::bind("0.0.0.0:7878").await?;
+    let listener = TcpListener::bind("0.0.0.0:7878").await.unwrap();
     println!("Listening on port 7878");
 
-    loop {
-        let (stream, addr) = listener.accept().await?;
+    tokio::spawn(async move {
+        loop {
+            let (stream, addr) = listener.accept().await?;
 
-        tokio::spawn(async move {
-            if let Err(e) = handle_connection(stream).await {
-                eprintln!("error handling connection {}: {:?}", addr, e);
-            };
-        });
-    }
+            tokio::spawn(async move {
+                if let Err(e) = handle_connection(stream).await {
+                    eprintln!("error handling connection {}: {:?}", addr, e);
+                };
+            });
+        }
+    })
 }
 
-async fn handle_connection(mut client_stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
+async fn handle_connection(mut client_stream: TcpStream) -> Result<(), BoxedErr> {
     let mut server_stream = TcpStream::connect("chat.protohackers.com:16963").await?;
     let (client_read, mut client_write) = client_stream.split();
     let (server_read, mut server_write) = server_stream.split();

@@ -13,7 +13,10 @@ use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
     net::{TcpListener, TcpStream},
     sync::broadcast::{self, Sender},
+    task::JoinHandle,
 };
+
+use crate::BoxedErr;
 
 #[derive(Clone, Debug)]
 enum Message {
@@ -22,32 +25,34 @@ enum Message {
     Message { name: String, text: String },
 }
 
-pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run() -> JoinHandle<Result<(), BoxedErr>> {
     println!("Problem 3 - Budget Chat");
 
-    let listener = TcpListener::bind("0.0.0.0:9999").await?;
+    let listener = TcpListener::bind("0.0.0.0:7878").await.unwrap();
     println!("Listening on port 7878");
 
-    let names = Arc::new(Mutex::new(HashSet::<String>::new()));
-    let (tx, _) = broadcast::channel::<Message>(16);
+    tokio::spawn(async move {
+        let names = Arc::new(Mutex::new(HashSet::<String>::new()));
+        let (tx, _) = broadcast::channel::<Message>(16);
 
-    loop {
-        let (stream, addr) = listener.accept().await?;
+        loop {
+            let (stream, addr) = listener.accept().await?;
 
-        let (names, tx) = (Arc::clone(&names), tx.clone());
-        tokio::spawn(async move {
-            if let Err(e) = handle_connection(stream, names, tx).await {
-                eprintln!("error handling connection {}: {:?}", addr, e);
-            };
-        });
-    }
+            let (names, tx) = (Arc::clone(&names), tx.clone());
+            tokio::spawn(async move {
+                if let Err(e) = handle_connection(stream, names, tx).await {
+                    eprintln!("error handling connection {}: {:?}", addr, e);
+                };
+            });
+        }
+    })
 }
 
 async fn handle_connection(
     mut stream: TcpStream,
     names: Arc<Mutex<HashSet<String>>>,
     tx: Sender<Message>,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), BoxedErr> {
     let (read, mut write) = stream.split();
     let mut read = BufReader::new(read);
 

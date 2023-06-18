@@ -5,7 +5,10 @@ use serde_json::{json, Number};
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
     net::{TcpListener, TcpStream},
+    task::JoinHandle,
 };
+
+use crate::BoxedErr;
 
 #[derive(Deserialize)]
 struct Request {
@@ -13,24 +16,26 @@ struct Request {
     number: Number,
 }
 
-pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run() -> JoinHandle<Result<(), BoxedErr>> {
     println!("Problem 1 - Prime Time");
 
-    let listener = TcpListener::bind("0.0.0.0:7878").await?;
+    let listener = TcpListener::bind("0.0.0.0:7878").await.unwrap();
     println!("Listening on port 7878");
 
-    loop {
-        let (stream, addr) = listener.accept().await?;
+    tokio::spawn(async move {
+        loop {
+            let (stream, addr) = listener.accept().await?;
 
-        tokio::spawn(async move {
-            if let Err(e) = handle_connection(stream).await {
-                eprintln!("error handling connection {}: {:?}", addr, e);
-            };
-        });
-    }
+            tokio::spawn(async move {
+                if let Err(e) = handle_connection(stream).await {
+                    eprintln!("error handling connection {}: {:?}", addr, e);
+                };
+            });
+        }
+    })
 }
 
-async fn handle_connection(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
+async fn handle_connection(mut stream: TcpStream) -> Result<(), BoxedErr> {
     let (read, mut write) = stream.split();
     let mut read = BufReader::new(read);
 
