@@ -22,7 +22,7 @@ async fn main() -> Result<(), BoxedErr> {
         3 => p03_budget_chat::run().await,
         4 => p04_unusual_database_program::run().await,
         5 => p05_mob_in_the_middle::run().await,
-        // 6 => p06_speed_daemon::run().await,
+        6 => p06_speed_daemon::run(None).await,
         _ => todo!(),
     }
     .await??;

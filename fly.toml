@@ -10,6 +10,9 @@ primary_region = "bos"
 internal_port = 7878
 protocol = "tcp"
 
+[services.concurrency]
+hard_limit = 150
+
 [[services.ports]]
 port = 7878
 
@@ -22,3 +25,6 @@ port = 7878
 
 [env]
 UDP_ADDRESS = "fly-global-services"
+
+[deploy]
+strategy = "immediate"
